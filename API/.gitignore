@@ -1,0 +1,67 @@
+﻿# Ignore build output
+bin/
+obj/
+Debug/
+Release/
+
+# Rider & VSCode Specific
+.idea/
+.vscode/
+*.sln.iml
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vscode/
+
+# Rider files
+.idea/
+*.sln.iml
+
+# Logs
+*.log
+logs/
+
+# ASP.NET Scaffolding
+.scaffolding
+
+# VSCode Specific
+.vscode/
+
+# Local History for JetBrains
+.idea/.idea.LocalHistory/
+
+# DotNet Crash Reports
+*.dotnetcrash
+
+# Ignore database files if they are SQLite or development/test databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Ignore local configuration files
+appsettings.*.json
+
+# Environment Variables and Keys (store keys securely)
+.env
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Packages
+*.nupkg
+*.snupkg
+.nuget/
+.packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+!**/packages/*.nupkg
+
+# Resharper Files
+_ReSharper*/
+*.DotSettings.user
