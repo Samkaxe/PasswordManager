@@ -8,8 +8,12 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/password-manager/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/UI/password-manager/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/password-manager/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/UI/password-manager/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/password-manager/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/UI/password-manager/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/password-manager/src/components/SignInPage/SignInPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/UI/password-manager/src/components/SignInPage/SignInPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/password-manager/src/components/TextInput/TextInput.tsx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/password-manager/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/UI/password-manager/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/password-manager/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/UI/password-manager/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +52,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "settings.vite",
-    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\WebStorm 2024.1\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external",
+    "ts.external.directory.path": "C:\\Users\\Bruger\\Documents\\GitHub\\PasswordManager\\UI\\password-manager\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -68,7 +72,7 @@
       <option name="presentableId" value="Default" />
       <updated>1727705585514</updated>
       <workItem from="1727705587279" duration="1397000" />
-      <workItem from="1727707017522" duration="3987000" />
+      <workItem from="1727707017522" duration="7173000" />
     </task>
     <servers />
   </component>
