@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "baseui": "^0.0.0-next-18f01efe0",
+    "styletron-engine-monolithic": "^1.0.0",
+    "styletron-react": "^6.1.1"
+  }
+}
