@@ -6,9 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="c69d53ac-1806-4efd-8ec8-48974b945c63" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/password-manager/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/UI/password-manager/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/password-manager/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/UI/password-manager/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/password-manager/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/UI/password-manager/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/password-manager/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/UI/password-manager/src/index.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,7 +68,7 @@
       <option name="presentableId" value="Default" />
       <updated>1727705585514</updated>
       <workItem from="1727705587279" duration="1397000" />
-      <workItem from="1727707017522" duration="1945000" />
+      <workItem from="1727707017522" duration="3987000" />
     </task>
     <servers />
   </component>
