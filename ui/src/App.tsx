@@ -1,29 +1,33 @@
-import React, {StrictMode, useState} from 'react';
+import React, { StrictMode, useState } from 'react';
 import './App.css';
-import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import ManageCredentialsPage from "./components/ManageCredentialsPage/ManageCredentialsPage";
 import SignInPage from "./components/SignInPage/SignInPage";
-import {ChakraProvider, ColorModeScript} from "@chakra-ui/react";
 import ResourceNotFoundPage from "./components/ResourceNotFoundPage/ResourceNotFoundPage";
+import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 
 function App() {
-
-    const [isAuthenticated, setIsAuthenticated] = useState(true); // Initially not authenticated
+    const [isAuthenticated, setIsAuthenticated] = useState(true);
 
     return (
-    <StrictMode>
-        <ChakraProvider>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="*" element={isAuthenticated ? <Navigate to="/manage-credentials" replace /> : <Navigate to="/sign-in" replace />} />
-                    <Route path="/sign-in" element={<SignInPage />} />
-                    <Route path="/manage-credentials" element={<ManageCredentialsPage />} />
-                    <Route path="/not-found" element={<ResourceNotFoundPage /> } />
-                </Routes>
-            </BrowserRouter>
-        </ChakraProvider>
-    </StrictMode>
-  );
+        <StrictMode>
+            <ChakraProvider>
+                <BrowserRouter>
+                    <Routes>
+                        {/* Unauthenticated Routes */}
+                        <Route path="/sign-in" element={!isAuthenticated ? <SignInPage /> : <Navigate to="/manage-credentials" replace />} />
+
+                        {/* Authenticated Routes */}
+                        <Route path="/manage-credentials" element={isAuthenticated ? <ManageCredentialsPage /> : <Navigate to="/sign-in" replace />} />
+                        {/* Add other authenticated routes here in a similar fashion */}
+
+                        {/* Catch-all for authenticated users */}
+                        <Route path="*" element={isAuthenticated ? <ResourceNotFoundPage /> : <Navigate to="/sign-in" replace />} />
+                    </Routes>
+                </BrowserRouter>
+            </ChakraProvider>
+        </StrictMode>
+    );
 }
 
 export default App;
