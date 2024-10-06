@@ -7,7 +7,7 @@ import ResourceNotFoundPage from "./components/ResourceNotFoundPage/ResourceNotF
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     return (
         <StrictMode>

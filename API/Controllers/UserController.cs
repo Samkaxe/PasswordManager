@@ -9,9 +9,11 @@ namespace API.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly ITokenService _tokenService;
 
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, ITokenService tokenService)
     {
+        _tokenService = tokenService;
         _userService = userService;
     }
 
@@ -21,7 +23,9 @@ public class UserController : ControllerBase
         try
         {
             var user = await _userService.CreateUserAsync(userCreateDto);
-            return Ok(user);
+            string token = _tokenService.CreateToken(user);
+            
+            return Ok(token);
         }
         catch (Exception ex)
         {
@@ -35,7 +39,8 @@ public class UserController : ControllerBase
         try
         {
             var user = await _userService.LoginAsync(userLoginDto);
-            return Ok(user);
+            string token = _tokenService.CreateToken(user);
+            return Ok(token);
         }
         catch (Exception ex)
         {

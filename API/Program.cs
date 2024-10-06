@@ -18,7 +18,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddSingleton(new EncryptionHelper("mySuperSecretKey1234567890")); // Ensure EncryptionHelper is registered
+builder.Services.AddScoped<EncryptionHelper>(provider => 
+        new EncryptionHelper("mySuperSecretKey1234567890") // Or retrieve the key from configuration
+);
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IWebsiteService, WebsiteService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
