@@ -1,5 +1,6 @@
 ﻿using API.Dto;
 using API.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -15,6 +16,7 @@ public class WebsiteController : ControllerBase
         _websiteService = websiteService;
     }
 
+    [Authorize]
     [HttpPost("create/{userId}")]
     public async Task<IActionResult> CreateWebsite(int userId, WebsiteCreateDto websiteCreateDto)
     {
@@ -30,6 +32,7 @@ public class WebsiteController : ControllerBase
     }
     
    
+    [Authorize]
     [HttpGet("getWebsites/{userId}")]
     public async Task<IActionResult> GetWebsitesByUserId(int userId)
     {
@@ -48,6 +51,7 @@ public class WebsiteController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpDelete("delete/{userId}/{websiteId}")]
     public async Task<IActionResult> DeleteWebsite(int userId, int websiteId)
     {
