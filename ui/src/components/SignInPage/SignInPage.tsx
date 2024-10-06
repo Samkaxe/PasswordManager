@@ -14,9 +14,11 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
 import authService from "../../services/authService";
 
-interface SignInPageProps {}
+interface SignInPageProps {
+    setIsAuthenticated: (value: boolean) => void;
+}
 
-const SignInPage: FC<SignInPageProps> = () => {
+const SignInPage: FC<SignInPageProps> = ({ setIsAuthenticated }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLogin, setIsLogin] = useState(true); // Start with login mode
     const [email, setEmail] = useState('');
@@ -31,8 +33,8 @@ const SignInPage: FC<SignInPageProps> = () => {
         try {
             if (isLogin) {
                 await authService.login({ username, password });
-                navigate('/manage-credentials');
                 // Success toast for login
+                setIsAuthenticated(true)
                 toast({
                     title: "Login Successful",
                     description: "You've successfully logged in!",
@@ -43,7 +45,7 @@ const SignInPage: FC<SignInPageProps> = () => {
                 });
             } else {
                 await authService.register({ username, email, password });
-                setIsLogin(true);
+                setIsAuthenticated(true);
                 // Success toast for registration
                 toast({
                     title: "Registration Successful",

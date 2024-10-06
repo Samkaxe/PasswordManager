@@ -1,4 +1,4 @@
-import React, { StrictMode, useState } from 'react';
+import React, {StrictMode, useEffect, useState} from 'react';
 import './App.css';
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import ManageCredentialsPage from "./components/ManageCredentialsPage/ManageCredentialsPage";
@@ -9,6 +9,11 @@ import {ChakraProvider, ColorModeScript, ToastProvider} from "@chakra-ui/react";
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        setIsAuthenticated(!!token);
+    }, []);
+
     return (
         <StrictMode>
             <ChakraProvider>
@@ -16,7 +21,7 @@ function App() {
                     <BrowserRouter>
                         <Routes>
                             {/* Unauthenticated Routes */}
-                            <Route path="/sign-in" element={!isAuthenticated ? <SignInPage /> : <Navigate to="/manage-credentials" replace />} />
+                            <Route path="/sign-in" element={!isAuthenticated ? <SignInPage setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/manage-credentials" replace />} />
 
                             {/* Authenticated Routes */}
                             <Route path="/manage-credentials" element={isAuthenticated ? <ManageCredentialsPage /> : <Navigate to="/sign-in" replace />} />
