@@ -7,7 +7,7 @@ const authService = {
         try {
             const response = await api.post('/api/User/login', credentials);
             // Store the token in local storage (replace with your preferred storage mechanism)
-            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('token', response.data);
             console.log('Login successful:', response.data);
         } catch (error) {
             console.error('Login failed:', error);
@@ -17,6 +17,7 @@ const authService = {
     register: async (credentials: SignUpDto) => {
         try {
             const response = await api.post('/api/User/register', credentials);
+            localStorage.setItem('token', response.data);
             console.log('Registration successful:', response.data);
         } catch (error) {
             console.error('Registration failed:', error);
