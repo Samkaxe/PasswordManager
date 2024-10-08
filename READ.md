@@ -84,7 +84,8 @@
 
 When you open the application in your web browser (typically at `http://localhost:3000`), you'll be presented with a login/sign-in page. This page allows you to either create a new user account or log in with your existing credentials.
 
-[Image of login/sign-in page]
+![image](https://github.com/user-attachments/assets/1ca82851-e222-46bb-bd1f-81ba7f43f79e)
+
 
 Once you've successfully authenticated, you'll be redirected to the "Manage Credentials" page. This page provides the following functionalities:
 
@@ -93,13 +94,11 @@ Once you've successfully authenticated, you'll be redirected to the "Manage Cred
     *   A "Generate Password" button allows you to generate a secure random password for the credential.
     *   After filling in the details, click the "Add Credential" button to save the new credential.
 
-[Image of "Manage Credentials" page with the form]
+![image](https://github.com/user-attachments/assets/052196f3-c1c9-4659-a288-7a4e570699be)
 
 *   **View existing credentials:**
     *   A list displays all the website credentials associated with your account.
     *   Each credential entry shows the website URL, username, and password (optionally hidden).
-
-[Image of "Manage Credentials" page with the list of credentials]
 
 *   **Delete credentials:**
     *   Each credential entry has a "Delete" button to remove the credential from your account.
@@ -107,7 +106,6 @@ Once you've successfully authenticated, you'll be redirected to the "Manage Cred
 *   **Logout:**
     *   A "Logout" button is located at the top right corner of the page. Clicking it will log you out of the application and clear your authentication token.
 
-[Image of the "Logout" button]
 
 **Additional Notes**
 
