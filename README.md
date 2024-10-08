@@ -8,10 +8,6 @@
     dotnet --version
     ```
 
-    If you need to install or update, you can download it from the official Microsoft website: [https://dotnet.microsoft.com/download](https://dotnet.microsoft.com/download)
-
-*   **(Optional) IDE:** While not strictly required, an IDE like Visual Studio or JetBrains Rider can significantly improve your development experience.
-
 ### Backend Setup (.NET)
 
 1.  **Navigate to the API directory:**
@@ -33,7 +29,7 @@
     dotnet ef database update
     ```
 
-    *   This will create the necessary tables in your database based on your `DbContext` configuration.
+    *   This will create the necessary tables in your database based on the `DbContext` configuration.
 
 4.  **Start the API server:**
 
@@ -41,14 +37,14 @@
     dotnet run
     ```
 
-    *   This will start your ASP.NET Core Web API, and it should be accessible at `https://localhost:5190` (or the port specified in your `launchSettings.json` file).
+    *   This will start your ASP.NET Core Web API, and it should be accessible at `https://localhost:5190` (or the port specified in `launchSettings.json` file).
 
 
 ### Frontend Setup (React)
 
 **System Requirements**
 
-*   **Node.js and npm:** Make sure you have Node.js and npm (or yarn) installed on your system. You can check your Node.js version using the command `node --version` and your npm version using `npm --version`. You can download Node.js (which includes npm) from the official website: [https://nodejs.org/](https://nodejs.org/)
+*   **Node.js and npm:** Make sure you have node and npm installed on your machine, the version used during development was @npm/10.2.1 and @node/20.9.0
 
 **Frontend Installation Steps**
 
@@ -70,7 +66,7 @@
     npm start
     ```
 
-    *   This will start your React development server, and your application should be accessible at `http://localhost:3000`
+    *   This will start your React development server, and your application should be accessible at `http://localhost:3000` and will not work if it's on a different port because of CORS
 
 **Additional Notes**
 
@@ -208,8 +204,6 @@ The frontend application also plays a crucial role in authorization and secure t
 *   **Issuer Signature:** While the frontend includes the JWT in the request header, the actual verification of the token happens on the backend. The backend API validates the token's signature, issuer, and other claims to ensure it's a valid token issued by the server.
 
 **Addressing the Vulnerability**
-
-You're correct about the potential vulnerability of an intercepted request being modified to access another user's credentials. However, the JWT verification on the backend mitigates this risk. Here's why:
 
 *   **Tamper-proof:** JWTs are digitally signed using a secret key that is only known to the server. If an attacker modifies the `userId` in the request, the signature verification on the backend will fail, and the request will be rejected.
 *   **User ID Claim:** The JWT contains the authenticated user's ID as a claim. The backend compares this ID with the `userId` provided in the request to ensure they match. If they don't, the request is denied, preventing unauthorized access to another user's data.
