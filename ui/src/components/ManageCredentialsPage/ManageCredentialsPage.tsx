@@ -10,7 +10,7 @@ import {
     HStack,
     Box,
     InputRightElement,
-    InputGroup, List, ListItem,
+    InputGroup, List, ListItem, Text,
 } from '@chakra-ui/react';
 import { DeleteIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { credentialService } from "../../services/credentialService";
@@ -166,18 +166,27 @@ const ManageCredentialsPage: FC<ManageCredentialsPageProps> = ({ setIsAuthentica
                 </Button>
             </VStack>
 
-            {/* Display the list of credentials */}
             <List spacing={3}>
                 {credentials.map((credential) => (
-                    <ListItem key={credential.id} p={4} borderWidth="1px" borderRadius="md" display="flex"
-                              justifyContent="space-between" alignItems="center">
-                        <span>{credential.websiteUrl}</span>
-                        <span>Username: {credential.username}</span>
+                    <ListItem
+                        key={credential.id}
+                        p={4}
+                        borderWidth="1px"
+                        borderRadius="md"
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="start"
+                        gap={2}
+                    >
+                        <Text fontWeight="bold">{credential.websiteUrl}</Text>
+                        <Text>Username: {credential.username}</Text>
+                        <Text>Password: {credential.password}</Text>
                         <IconButton
                             colorScheme="red"
                             aria-label="Delete credential"
-                            icon={<DeleteIcon/>}
+                            icon={<DeleteIcon />}
                             onClick={() => deleteCredential(credential.id)}
+                            alignSelf="end"
                         />
                     </ListItem>
                 ))}
