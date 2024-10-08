@@ -61,7 +61,7 @@ public class WebsiteController : ControllerBase
             var websites = await _websiteService.GetWebsitesByUserIdAsync(userId);
             if (!websites.Any())
             {
-                return NotFound("No websites found for the given user.");
+                return Ok(Enumerable.Empty<WebsiteDto>());
             }
             return Ok(websites);
         }
