@@ -2,7 +2,7 @@
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
     <data-source source="LOCAL" name="password_manager" uuid="eef31163-3358-4443-b3e1-010dd7f0a49c">
-      <driver-ref>sqlite.xerial</driver-ref>
+      <driver-ref>239d5129-2839-435a-9560-77e5a75c72b1</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:C:\Users\charl\RiderProjects\PasswordManager\API\password_manager.db</jdbc-url>
