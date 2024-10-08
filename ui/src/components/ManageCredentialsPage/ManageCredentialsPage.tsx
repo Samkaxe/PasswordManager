@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, FC} from 'react';
 import {
     Button,
     FormControl,
@@ -15,8 +15,13 @@ import {
 import { DeleteIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { credentialService } from "../../services/credentialService";
 import { CredentialDto } from "../../dtos/CredentialDto";
+import passwordGeneratorService from "../../services/passwordGeneratorService";
 
-const ManageCredentialsPage = () => {
+interface ManageCredentialsPageProps {
+    setIsAuthenticated: (value: boolean) => void;
+}
+
+const ManageCredentialsPage: FC<ManageCredentialsPageProps> = ({ setIsAuthenticated }) => {
     const [credentials, setCredentials] = useState<CredentialDto[]>([]);
     const [websiteUrl, setWebsiteUrl] = useState('');
     const [username, setUsername] = useState('');
@@ -28,6 +33,11 @@ const ManageCredentialsPage = () => {
     useEffect(() => {
         fetchCredentials();
     }, []);
+
+    const handleGeneratePassword = () => {
+        const password = passwordGeneratorService.generate(12)
+        setPassword(password);
+    }
 
     const fetchCredentials = async () => {
         try {
@@ -94,9 +104,22 @@ const ManageCredentialsPage = () => {
     const handleTogglePasswordVisibility = () => setShowPassword(!showPassword);
 
 
+    function handleLogout() {
+        localStorage.clear()
+        setIsAuthenticated(false)
+    }
+
     return (
         <Box p={8} className={"flex flex-row justify-between gap-4 max-w-4xl w-full"}>
-            <VStack as="form" onSubmit={(e) => { e.preventDefault(); addCredential(); }} spacing={4} align="stretch" maxW="md" mb={8}>
+
+            <Button colorScheme="red" className={"!fixed right-10 top-10"} variant="outline" size="sm" onClick={handleLogout}>
+                Logout
+            </Button>
+
+            <VStack as="form" onSubmit={(e) => {
+                e.preventDefault();
+                addCredential();
+            }} spacing={4} align="stretch" maxW="md" mb={8}>
                 <FormControl>
                     <FormLabel>Website URL</FormLabel>
                     <Input
@@ -127,12 +150,17 @@ const ManageCredentialsPage = () => {
                         <InputRightElement width="4.5rem">
                             <IconButton
                                 aria-label={showPassword ? 'Hide password' : 'Show password'}
-                                icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                                icon={showPassword ? <ViewOffIcon/> : <ViewIcon/>}
                                 onClick={handleTogglePasswordVisibility}
                             />
                         </InputRightElement>
                     </InputGroup>
                 </FormControl>
+
+                <Button colorScheme="green" onClick={handleGeneratePassword}>
+                    Generate password
+                </Button>
+
                 <Button colorScheme="blue" type="submit">
                     Add Credential
                 </Button>
@@ -141,13 +169,14 @@ const ManageCredentialsPage = () => {
             {/* Display the list of credentials */}
             <List spacing={3}>
                 {credentials.map((credential) => (
-                    <ListItem key={credential.id} p={4} borderWidth="1px" borderRadius="md" display="flex" justifyContent="space-between" alignItems="center">
+                    <ListItem key={credential.id} p={4} borderWidth="1px" borderRadius="md" display="flex"
+                              justifyContent="space-between" alignItems="center">
                         <span>{credential.websiteUrl}</span>
                         <span>Username: {credential.username}</span>
                         <IconButton
                             colorScheme="red"
                             aria-label="Delete credential"
-                            icon={<DeleteIcon />}
+                            icon={<DeleteIcon/>}
                             onClick={() => deleteCredential(credential.id)}
                         />
                     </ListItem>
