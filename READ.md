@@ -42,3 +42,75 @@
     ```
 
     *   This will start your ASP.NET Core Web API, and it should be accessible at `https://localhost:5190` (or the port specified in your `launchSettings.json` file).
+
+
+### Frontend Setup (React)
+
+**System Requirements**
+
+*   **Node.js and npm:** Make sure you have Node.js and npm (or yarn) installed on your system. You can check your Node.js version using the command `node --version` and your npm version using `npm --version`. You can download Node.js (which includes npm) from the official website: [https://nodejs.org/](https://nodejs.org/)
+
+**Frontend Installation Steps**
+
+1.  **Navigate to the UI directory:**
+
+    ```bash
+    cd ui
+    ```
+
+2.  **Install dependencies:**
+
+    ```bash
+    npm install
+    ```
+
+3.  **Start the development server:**
+
+    ```bash
+    npm start
+    ```
+
+    *   This will start your React development server, and your application should be accessible at `http://localhost:3000`
+
+**Additional Notes**
+
+*   **Troubleshooting:** If you encounter any errors during the setup process, refer to the troubleshooting section in this README (you'll add this section later) or consult the documentation for your specific tools and technologies.
+*   **Environment variables:** If you're using environment variables (like we did for the API base URL), make sure to create a `.env` file (or `.env.local` for local development) in your `ui` directory and define the necessary variables.
+*   **Building for production:** When you're ready to deploy your frontend application, use the command `npm run build` (or `yarn build`) to create a production-ready build. This will generate optimized files in the `build` directory.
+*   **Backend API:** Ensure your backend API is running and accessible at the base URL specified in your frontend environment variables.
+
+
+## Application Functionality
+
+When you open the application in your web browser (typically at `http://localhost:3000`), you'll be presented with a login/sign-in page. This page allows you to either create a new user account or log in with your existing credentials.
+
+[Image of login/sign-in page]
+
+Once you've successfully authenticated, you'll be redirected to the "Manage Credentials" page. This page provides the following functionalities:
+
+*   **Create a new credential:**
+    *   A form is provided to input the details of a new website credential, including the website URL, username, and password.
+    *   A "Generate Password" button allows you to generate a secure random password for the credential.
+    *   After filling in the details, click the "Add Credential" button to save the new credential.
+
+[Image of "Manage Credentials" page with the form]
+
+*   **View existing credentials:**
+    *   A list displays all the website credentials associated with your account.
+    *   Each credential entry shows the website URL, username, and password (optionally hidden).
+
+[Image of "Manage Credentials" page with the list of credentials]
+
+*   **Delete credentials:**
+    *   Each credential entry has a "Delete" button to remove the credential from your account.
+
+*   **Logout:**
+    *   A "Logout" button is located at the top right corner of the page. Clicking it will log you out of the application and clear your authentication token.
+
+[Image of the "Logout" button]
+
+**Additional Notes**
+
+*   The application uses secure storage and encryption mechanisms to protect your credentials.
+*   The password generation feature uses a cryptographically secure random number generator to create strong and unique passwords.
+*   The application is designed to be user-friendly and intuitive, even for those unfamiliar with password managers.
