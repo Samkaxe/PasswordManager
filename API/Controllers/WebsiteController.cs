@@ -18,22 +18,15 @@ public class WebsiteController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("create/{userId}")]
-    public async Task<IActionResult> CreateWebsite(int userId, WebsiteCreateDto websiteCreateDto)
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateWebsite(WebsiteCreateDto websiteCreateDto)
     {
         
         var tokenUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-        // Check if the userId in the route matches the one in the token
-        if (userId != tokenUserId)
-        {
-            return Unauthorized("Unauthorized access. User ID mismatch.");
-        }
-        
-        
         try
         {
-            var website = await _websiteService.CreateWebsiteAsync(userId, websiteCreateDto);
+            var website = await _websiteService.CreateWebsiteAsync(tokenUserId, websiteCreateDto);
             return Ok(website);
         }
         catch (Exception ex)
@@ -44,21 +37,15 @@ public class WebsiteController : ControllerBase
     
    
     [Authorize]
-    [HttpGet("getWebsites/{userId}")]
-    public async Task<IActionResult> GetWebsitesByUserId(int userId)
+    [HttpGet("getWebsites")]
+    public async Task<IActionResult> GetWebsitesByUserId()
     {
         
         var tokenUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-
-        // Check if the userId in the route matches the one in the token
-        if (userId != tokenUserId)
-        {
-            return Unauthorized("Unauthorized access. User ID mismatch.");
-        }
         
         try
         {
-            var websites = await _websiteService.GetWebsitesByUserIdAsync(userId);
+            var websites = await _websiteService.GetWebsitesByUserIdAsync(tokenUserId);
             if (!websites.Any())
             {
                 return Ok(Enumerable.Empty<WebsiteDto>());
@@ -72,21 +59,15 @@ public class WebsiteController : ControllerBase
     }
 
     [Authorize]
-    [HttpDelete("delete/{userId}/{websiteId}")]
-    public async Task<IActionResult> DeleteWebsite(int userId, int websiteId)
+    [HttpDelete("delete/{websiteId}")]
+    public async Task<IActionResult> DeleteWebsite(int websiteId)
     {
         
         var tokenUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-        // Check if the userId in the route matches the one in the token
-        if (userId != tokenUserId)
-        {
-            return Unauthorized("Unauthorized access. User ID mismatch.");
-        }
-        
         try
         {
-            await _websiteService.DeleteWebsiteAsync(userId, websiteId);
+            await _websiteService.DeleteWebsiteAsync(tokenUserId, websiteId);
             return Ok(new { message = "Website deleted successfully" });
         }
         catch (Exception ex)

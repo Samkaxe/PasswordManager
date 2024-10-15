@@ -17,23 +17,17 @@ const getUserIdFromToken = () => {
 
 export const credentialService = {
     createCredential: async (credential: { websiteUrl: string, username: string, password: string }) => {
-        const userId = getUserIdFromToken();
-        if (!userId) throw new Error('User ID not found in token');
-        const { data } = await api.post(`/api/Website/create/${userId}`, credential);
+        const { data } = await api.post(`/api/Website/create`, credential);
         return data;
     },
 
     getCredentials: async () => {
-        const userId = getUserIdFromToken();
-        if (!userId) throw new Error('User ID not found in token');
-        const { data } = await api.get(`/api/Website/getWebsites/${userId}`);
+        const { data } = await api.get(`/api/Website/getWebsites/`);
         return data;
     },
 
     deleteCredential: async (websiteId: number) => {
-        const userId = getUserIdFromToken();
-        if (!userId) throw new Error('User ID not found in token');
-        const { data } = await api.delete(`/api/Website/delete/${userId}/${websiteId}`);
+        const { data } = await api.delete(`/api/Website/delete/${websiteId}`);
         return data;
     }
 };
