@@ -30,7 +30,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<EncryptionHelper>(provider => 
-        new EncryptionHelper(builder.Configuration.GetSection("EncryptionHelper").Value) // Or retrieve the key from configuration
+        new EncryptionHelper(builder.Configuration.GetSection("EncryptionHelper").Value)
 );
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -45,13 +45,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime
-                = true,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration[builder.Configuration.GetSection("JwtIssuer").Value],
-            ValidAudience = builder.Configuration[builder.Configuration.GetSection("JwtAudience").Value],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration[builder.Configuration.GetSection("JwtKey").Value])) 
-
+            ValidIssuer = builder.Configuration.GetSection("JwtIssuer").Value!,
+            ValidAudience = builder.Configuration.GetSection("JwtAudience").Value!,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JwtKey").Value!)) 
         };
     });
 

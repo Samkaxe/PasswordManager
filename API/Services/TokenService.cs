@@ -26,7 +26,7 @@ namespace API.Services
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            var tokenKey = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+            var tokenKey = Encoding.UTF8.GetBytes(_configuration.GetSection("JwtKey").Value!);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -36,12 +36,12 @@ namespace API.Services
 
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
-                Issuer = _configuration["Jwt:Issuer"],
-                Audience = _configuration["Jwt:Audience"],
+                Issuer = _configuration.GetSection("JwtIssuer").Value!,
+                Audience = _configuration.GetSection("JwtAudience").Value!,
                 SigningCredentials
-                    = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
+                    = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha512Signature)
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);   
+            var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
         }
