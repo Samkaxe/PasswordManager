@@ -124,34 +124,50 @@ The relationship between these entities is straightforward:
 
 [Image of data model diagram]
 
+## Secure Key Management with Azure Key Vault
+
+This application utilizes Azure Key Vault to securely store and manage sensitive information, including:
+
+* **Encryption Keys:** Used for encrypting sensitive user data.
+* **JWT Signing Key:**  Used for signing and validating JSON Web Tokens (JWTs) for authentication.
+* **JWT Issuer**: Additional token validation parameter
+* **JWT Audience**: Additional token validation parameter
+
 ## Encryption and Decryption of Website Credentials
 
-Protecting sensitive data is paramount in a password manager application. To ensure the confidentiality and integrity of your stored website credentials, this application employs robust encryption and decryption mechanisms, specifically focusing on protecting data **at rest**. This means that even if an attacker gains access to the database file, the encrypted credentials remain unreadable without the proper decryption key.
+This application prioritizes the security of your website credentials. Here's how it's done:
 
-**Encryption Process**
+**Encryption:**
 
-1.  **Encryption Key:** A unique encryption key is generated for each user. This key is derived from the user's master password using a secure key derivation function (bcrypt). This ensures that the encryption key is not stored directly and is only generated when needed for decryption.
+* **AES-256 Encryption:** Website passwords are encrypted using AES-256, a strong, industry-standard encryption algorithm.
+* **Encryption Helper:** The `EncryptionHelper` class provides methods for encrypting and decrypting passwords using a secure key stored in Azure Key Vault.
 
-2.  **AES Encryption:** The website usernames and passwords are encrypted using the Advanced Encryption Standard (AES) algorithm. AES is a widely recognized and trusted encryption standard that provides strong security and is commonly used for protecting sensitive data.
+**Storage:**
 
-3.  **Initialization Vector (IV):** A unique, randomly generated initialization vector (IV) is used for each encryption operation. This ensures that even if the same password is encrypted multiple times, the resulting ciphertext will be different, adding an extra layer of protection.
+* **Encrypted in Database:** Encrypted passwords are stored as byte arrays in the database. This ensures that even if the database is compromised, the passwords remain protected.
 
-4.  **Ciphertext Storage:** The encrypted credentials, along with the IV, are stored as a byte array in the database. This ensures that the raw encrypted data is preserved without any potential encoding issues.
+**Key Management:**
 
-**Decryption Process**
+* **Azure Key Vault:** The encryption key used by the `EncryptionHelper` is securely stored in Azure Key Vault.
+* **Managed Identities:** The application accesses the encryption key using managed identities, eliminating the need to store credentials directly in the application.
 
-1.  **Key Derivation:** When a user logs in, their master password is used to derive the same encryption key that was used to encrypt their credentials.
+**Decryption:**
 
-2.  **IV Retrieval:** The IV is retrieved from the stored ciphertext.
+* **On-Demand Decryption:** Passwords are decrypted only when needed, such as when a user requests to view their website credentials.
+* **Secure Handling:** Decrypted passwords are handled in memory and are not stored in any persistent form.
 
-3.  **AES Decryption:** The AES algorithm is used to decrypt the website username and password using the derived key and the retrieved IV.
+**Example Code Snippet (from `WebsiteService`)**
 
-**Security Considerations**
+```csharp
+// Encrypt the password
+var encryptedPassword = _encryptionHelper.Encrypt(websiteCreateDto.Password);
 
-*   **Key Management:** The encryption key is never stored directly. It is derived from the user's master password whenever needed, ensuring that the key is not exposed even if the database is compromised.
-*   **Strong Encryption:** AES is a strong encryption algorithm that provides a high level of security against unauthorized access.
-*   **Unique IVs:** The use of unique IVs for each encryption operation enhances security by ensuring that identical passwords don't result in identical ciphertexts.
+// ... store encryptedPassword in the database
 
+// ... later, when retrieving the website data:
+Password = _encryptionHelper.Decrypt(Encoding.UTF8.GetString(website.EncryptedPassword)) 
+
+```
 
 ## User Security
 
@@ -203,12 +219,6 @@ The frontend application also plays a crucial role in authorization and secure t
 
 *   **Issuer Signature:** While the frontend includes the JWT in the request header, the actual verification of the token happens on the backend. The backend API validates the token's signature, issuer, and other claims to ensure it's a valid token issued by the server.
 
-**Addressing the Vulnerability**
-
-*   **Tamper-proof:** JWTs are digitally signed using a secret key that is only known to the server. If an attacker modifies the `userId` in the request, the signature verification on the backend will fail, and the request will be rejected.
-*   **User ID Claim:** The JWT contains the authenticated user's ID as a claim. The backend compares this ID with the `userId` provided in the request to ensure they match. If they don't, the request is denied, preventing unauthorized access to another user's data.
-
-
 ## Password Generation
 
 The password manager provides a secure and convenient way to generate strong, random passwords for your website credentials. This feature helps you create passwords that are difficult to guess or crack, enhancing the security of your online accounts.
@@ -218,3 +228,13 @@ The password manager provides a secure and convenient way to generate strong, ra
 *   **Browser-Native Crypto API:** The application utilizes the browser's built-in `crypto` API to generate cryptographically secure random values. This ensures that the generated passwords are truly random and unpredictable.
 *   **Customization Options:** You can customize the length and complexity of the generated passwords by specifying the desired length and including or excluding character sets (uppercase, lowercase, numbers, symbols).
 *   **Frontend Generation:**
+
+
+## Potential Vulnerabilities
+
+*   **Compromised Credentials:** If the credentials used to access Key Vault are compromised, attackers could gain access to the encryption keys and other sensitive information.
+*   **Authorization Issues:**  Incorrectly configured authorization rules could allow users to access resources they are not authorized to access.
+*    **Token Interception:** If a JWT is intercepted, an attacker could potentially gain unauthorized access to the application or decrypt sensitive data if the token provides access to decryption keys.
+    *   **Mitigation:** Use short token lifespans, HTTPS, secure token storage (HttpOnly cookies), token blacklisting, and consider JWE (JSON Web Encryption) for sensitive data in tokens.
+
+
