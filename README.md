@@ -133,54 +133,284 @@ This application utilizes Azure Key Vault to securely store and manage sensitive
 * **JWT Issuer**: Additional token validation parameter
 * **JWT Audience**: Additional token validation parameter
 
+ ```csharp
+    var keyVaultUrl = new Uri(builder.Configuration.GetSection("AzureVault:Url").Value!);
+    var azureCredential = new ClientSecretCredential(
+    builder.Configuration.GetSection("AzureVault:AzureClientTenantId").Value!,
+    builder.Configuration.GetSection("AzureVault:AzureClientId").Value!,
+    builder.Configuration.GetSection("AzureVault:AzureClientSecret").Value!);
+
+builder.Configuration.AddAzureKeyVault(keyVaultUrl, azureCredential);
+ ```
+ 
 ## Encryption and Decryption of Website Credentials
+```csharp
+public class EncryptionHelper
+{
+private readonly byte[] _key;
 
-This application prioritizes the security of your website credentials. Here's how it's done:
+    public EncryptionHelper(string key)
+    {
+       
+        _key = Encoding.UTF8.GetBytes(key.PadRight(32).Substring(0, 32));
+    }
 
-**Encryption:**
+    public string Encrypt(string plainText)
+    {
+        using (var aesAlg = Aes.Create())
+        {
+            aesAlg.Key = _key;
+            aesAlg.GenerateIV();
+            var encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
 
-* **AES-256 Encryption:** Website passwords are encrypted using AES-256, a strong, industry-standard encryption algorithm.
-* **Encryption Helper:** The `EncryptionHelper` class provides methods for encrypting and decrypting passwords using a secure key stored in Azure Key Vault.
+            using (var msEncrypt = new MemoryStream())
+            {
+               
+                msEncrypt.Write(aesAlg.IV, 0, aesAlg.IV.Length);
+                using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                using (var swEncrypt = new StreamWriter(csEncrypt))
+                {
+                    swEncrypt.Write(plainText);
+                }
+                return Convert.ToBase64String(msEncrypt.ToArray());
+            }
+        }
+    }
 
-**Storage:**
+    public string Decrypt(string cipherText)
+    {
+        var fullCipher = Convert.FromBase64String(cipherText);
 
-* **Encrypted in Database:** Encrypted passwords are stored as byte arrays in the database. This ensures that even if the database is compromised, the passwords remain protected.
+        using (var aesAlg = Aes.Create())
+        {
+            aesAlg.Key = _key;
+            
+            var iv = new byte[aesAlg.BlockSize / 8];
+            Array.Copy(fullCipher, iv, iv.Length);
+            aesAlg.IV = iv;
 
-**Key Management:**
+            var decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 
-* **Azure Key Vault:** The encryption key used by the `EncryptionHelper` is securely stored in Azure Key Vault.
-* **Managed Identities:** The application accesses the encryption key using managed identities, eliminating the need to store credentials directly in the application.
+            using (var msDecrypt = new MemoryStream(fullCipher, iv.Length, fullCipher.Length - iv.Length))
+            using (var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+            using (var srDecrypt = new StreamReader(csDecrypt))
+            {
+                return srDecrypt.ReadToEnd();
+            }
+        }
+    }
+}
+```
 
-**Decryption:**
+## EncryptionHelper Class
 
-* **On-Demand Decryption:** Passwords are decrypted only when needed, such as when a user requests to view their website credentials.
-* **Secure Handling:** Decrypted passwords are handled in memory and are not stored in any persistent form.
+The `EncryptionHelper` class provides two key methods: `Encrypt` and `Decrypt`. It uses the AES (Advanced Encryption Standard) algorithm to encrypt and decrypt website credentials, such as passwords, to ensure their security in the database.
 
-**Example Code Snippet (from `WebsiteService`)**
+### Constructor: `EncryptionHelper(string key)`
+- **Purpose**: Initializes the helper with a secret key, which is used for encryption and decryption.
+- **Process**: The provided key is processed to ensure it is exactly 32 bytes long, as required by AES. If the key is shorter, it is padded with additional characters; if longer, it is trimmed.
+
+### Method: `Encrypt(string plainText)`
+- **Purpose**: Encrypts plain text (such as a website password) into a secure, encoded format.
+- **Process**:
+    1. Creates an instance of the AES algorithm (`Aes.Create()`).
+    2. Sets the key and generates a new initialization vector (IV) for each encryption session to ensure that encrypting the same text multiple times produces different results.
+    3. Writes the IV into a `MemoryStream`, followed by the encrypted version of the plain text using a `CryptoStream` and `StreamWriter`.
+    4. Converts the entire content (IV + encrypted data) into a Base64 string for storage.
+
+### Method: `Decrypt(string cipherText)`
+- **Purpose**: Decrypts an encrypted string back into plain text.
+- **Process**:
+    1. Converts the Base64-encoded cipher text back into a byte array.
+    2. Extracts the IV (stored at the beginning of the byte array) for use in decryption.
+    3. Uses the AES algorithm to decrypt the remaining encrypted data.
+    4. Converts the decrypted byte array back into plain text.
+
+
+
+## Explanation of `CreateWebsiteAsync` Method
 
 ```csharp
-// Encrypt the password
-var encryptedPassword = _encryptionHelper.Encrypt(websiteCreateDto.Password);
+public async Task<WebsiteDto> CreateWebsiteAsync(int userId, WebsiteCreateDto websiteCreateDto)
+{
+var user = await _userRepository.GetUserByIdAsync(userId);
+if (user == null)
+{
+throw new ArgumentException("User not found.");
+}
 
-// ... store encryptedPassword in the database
+        // Encrypt the password
+        var encryptedPassword = _encryptionHelper.Encrypt(websiteCreateDto.Password);
 
-// ... later, when retrieving the website data:
-Password = _encryptionHelper.Decrypt(Encoding.UTF8.GetString(website.EncryptedPassword)) 
+        var website = new Website
+        {
+            UserId = userId,
+            WebsiteUrl = websiteCreateDto.WebsiteUrl,
+            Username = websiteCreateDto.Username,
+            EncryptedPassword = Encoding.UTF8.GetBytes(encryptedPassword) 
+        };
+
+        var createdWebsite = await _websiteRepository.CreateWebsiteAsync(website);
+
+        return new WebsiteDto
+        {
+            Id = createdWebsite.Id,
+            WebsiteUrl = createdWebsite.WebsiteUrl,
+            Username = createdWebsite.Username
+        };
+    }
 
 ```
 
+This method handles the process of creating a new website record for a user, including securely storing the website's credentials (password) in an encrypted format.
+
+### Key Steps:
+1. **User Validation**: It first checks if the user exists by retrieving the user data using their `userId`. If the user does not exist, it throws an error.
+2. **Password Encryption**: The provided password (`websiteCreateDto.Password`) is encrypted using the `Encrypt` method from the `EncryptionHelper` class.
+3. **Website Creation**: A new `Website` object is created, with the encrypted password stored as a byte array. The password is converted to a UTF-8 encoded byte array after encryption for secure storage in the database.
+4. **Repository Interaction**: The `website` object is then passed to a repository to be saved in the database (`CreateWebsiteAsync`).
+5. **Return Value**: After successfully saving, it returns a `WebsiteDto` object containing the relevant website details (but excluding the password, for security reasons).
+
+
+
+
+---
+
+## Explanation of `GetWebsitesByUserIdAsync` Method
+
+```csharp
+ public async Task<IEnumerable<WebsiteDto>> GetWebsitesByUserIdAsync(int userId)
+    {
+        var websites = await _websiteRepository.GetWebsitesByUserIdAsync(userId);
+        if (websites == null || !websites.Any())
+        {
+            return new List<WebsiteDto>();
+        }
+
+        return websites.Select(website => new WebsiteDto
+        {
+            Id = website.Id,
+            WebsiteUrl = website.WebsiteUrl,
+            Username = website.Username,
+            Password = _encryptionHelper.Decrypt(Encoding.UTF8.GetString(website.EncryptedPassword)) 
+        });
+    }
+```
+
+This method retrieves all websites associated with a user and decrypts their encrypted passwords for display.
+
+### Key Steps:
+1. **Fetching Websites**: It retrieves all website entries related to the `userId` from the database using the repository (`GetWebsitesByUserIdAsync`).
+2. **Decryption of Passwords**: For each website entry, it decrypts the stored encrypted password using the `Decrypt` method of the `EncryptionHelper`. The `website.EncryptedPassword` is a byte array that must be decoded back to a string before decryption.
+3. **Return Value**: It returns a collection of `WebsiteDto` objects, each containing the decrypted password, along with other website details like `WebsiteUrl` and `Username`.
+
+
 ## User Security
 
-The application prioritizes the security of user accounts and employs robust measures to protect sensitive information.
+The `UserService` class is responsible for handling the creation and authentication (login) of users. 
+It ensures that passwords are securely hashed and compared using the **HMACSHA512** algorithm, 
+which is crucial for maintaining security in the system.
 
-**Password Hashing and Salting**
+### HMACSHA512 and Its Use in Security
 
-*   **bcrypt:** User passwords are hashed using bcrypt, a strong and widely recommended password hashing algorithm. Bcrypt is specifically designed to be computationally expensive, making it difficult for attackers to crack passwords even if they gain access to the hashed values.
-*   **Salting:** Each password is also salted with a unique, randomly generated salt value before hashing. This adds an extra layer of protection by ensuring that even if two users have the same password, their hashed passwords will be different, preventing rainbow table attacks.
+**HMACSHA512** (Hash-based Message Authentication Code with SHA-512) is a cryptographic
+hash function that combines the **SHA-512** hashing algorithm with a secret key 
+(known as the salt) to generate a **one-way hash**.
+This method is particularly useful for securely storing passwords because the
+hashed value cannot be reversed to retrieve the original password (making it "one-way").
 
-**Password Storage**
+### Why HMACSHA512 Is Useful for Security
+- **Irreversible Hashing**: When a user creates a password, it is hashed using HMACSHA512. 
+- This ensures that even if an attacker gains access to the hashed password, 
+- they cannot reverse the process to retrieve the original password.
+- **Password Salting**: The HMACSHA512 algorithm uses a salt (a randomly generated key)
+- to add an extra layer of security.
+- This ensures that even if two users have the same password,
+- their stored password hashes will be different.
+- **Security in Comparison**: When a user attempts to log in, 
+- their entered password is hashed again with the stored salt
+- (from when the account was created).
+- The two hashes (the one stored and the one just computed) are then compared.
+- If they match, the user is authenticated.
 
-*   **Database Storage:** Only the hashed and salted password values are stored in the database. The actual passwords are never stored, making it extremely difficult for attackers to recover them even if they compromise the database.
+### Why HMACSHA512 Is Not Suitable for Encryption
+HMACSHA512 is a **one-way cryptographic function**, 
+meaning that once the password is hashed,
+it **cannot be decrypted** back into its original form.
+This makes it ideal for storing passwords securely but
+unsuitable for encryption scenarios where data must be decrypted later.
+
+In contrast, **AES** (used in the `EncryptionHelper` class) is a **symmetric encryption algorithm**. It allows both encryption and decryption, meaning the original data can be retrieved later, which is crucial for storing sensitive information like website passwords that need to be accessed in the future.
+
+### Example Usage in the `CreateUserAsync` Method:
+- When creating a user, HMACSHA512 is used to generate a `PasswordHash` from the user's password.
+- The salt (`hmac.Key`) is stored alongside the hash to be used later for verification during login.
+- The user's password is **not stored in plain text** but is instead stored as a secure, hashed value.
+
+```csharp
+var user = new User
+{
+    Username = userCreateDto.Username.ToLower(),
+    PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userCreateDto.Password)),  // Generate the hash
+    PasswordSalt = hmac.Key,  // Store the salt (HMAC key)
+    Email = userCreateDto.Email
+};
+
+```csharp
+  public async Task<UserDto> CreateUserAsync(UserCreateDto userCreateDto)
+    {
+        using var hmac = new HMACSHA512();
+
+        var user = new User
+        {
+            Username = userCreateDto.Username.ToLower(),
+            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userCreateDto.Password)),
+            PasswordSalt = hmac.Key, 
+            Email = userCreateDto.Email
+        };
+
+    
+        var createdUser = await _userRepository.CreateUserAsync(user);
+
+        
+        return new UserDto
+        {
+            Id = createdUser.Id,
+            Username = createdUser.Username,
+            Email = createdUser.Email
+        };
+    }
+    
+    public async Task<UserDto> LoginAsync(UserLoginDto userLoginDto)
+    {
+        
+        var user = await _userRepository.GetUserByUsernameAsync(userLoginDto.Username);
+        if (user == null)
+        {
+            throw new UnauthorizedAccessException("Invalid username or password.");
+        }
+        
+        using var hmac = new HMACSHA512(user.PasswordSalt);
+        
+        var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userLoginDto.Password));
+
+       
+        for (int i = 0; i < computedHash.Length; i++)
+        {
+            if (computedHash[i] != user.PasswordHash[i])
+            {
+                throw new UnauthorizedAccessException("Invalid username or password.");
+            }
+        }
+        
+        return new UserDto
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email
+        };
+    }
+```
 
 
 ## Endpoint Authorization and JWT Verification
