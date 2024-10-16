@@ -425,8 +425,9 @@ In addition to securing user data, the application implements robust authorizati
 **User ID Verification**
 
 *   For endpoints that involve user-specific resources (such as creating, retrieving, or deleting website credentials), the application performs an additional verification step.
-*   The `userId` provided in the request (e.g., as a route parameter) is compared against the `userId` extracted from the JWT claims.
-*   If the IDs don't match, the request is rejected with an unauthorized error, preventing users from accessing data that doesn't belong to them.
+*   These requests don't have the userid attached in the request body, but rather rely on the NameIdentifier claim to contain the userID
+  ![image](https://github.com/user-attachments/assets/b851f0e7-995a-435b-8632-19b4635eccce)
+
 
 
 ## Frontend Authorization and Token Handling
@@ -456,8 +457,8 @@ The password manager provides a secure and convenient way to generate strong, ra
 **Password Generation Mechanism**
 
 *   **Browser-Native Crypto API:** The application utilizes the browser's built-in `crypto` API to generate cryptographically secure random values. This ensures that the generated passwords are truly random and unpredictable.
-*   **Customization Options:** You can customize the length and complexity of the generated passwords by specifying the desired length and including or excluding character sets (uppercase, lowercase, numbers, symbols).
-*   **Frontend Generation:**
+![image](https://github.com/user-attachments/assets/f38b17db-8ab7-452b-b2a6-0ead66eed669)
+
 
 
 ## Potential Vulnerabilities
