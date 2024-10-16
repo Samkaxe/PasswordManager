@@ -195,7 +195,7 @@ In addition to securing user data, the application implements robust authorizati
 **User ID Verification**
 
 *   For endpoints that involve user-specific resources (such as creating, retrieving, or deleting website credentials), the application performs an additional verification step.
-*   These requests don't have the userid attached in the request body, but rather on the NameIdentifier claim to contain the userID
+*   These requests don't have the userid attached in the request body, but rather rely on the NameIdentifier claim to contain the userID
   ![image](https://github.com/user-attachments/assets/b851f0e7-995a-435b-8632-19b4635eccce)
 
 
